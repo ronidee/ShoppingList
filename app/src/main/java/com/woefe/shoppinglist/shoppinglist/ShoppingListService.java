@@ -95,6 +95,10 @@ public class ShoppingListService extends Service implements SharedPreferences.On
             manager.addList(listName);
         }
 
+        public void renameList(String oldName, String newName) {
+            manager.rename(oldName, newName);
+        }
+
         public boolean removeList(String listName) {
             return manager.removeList(listName);
         }

@@ -89,6 +89,16 @@ public class MainActivity extends BinderActivity implements
 
         final Toolbar toolbar = findViewById(R.id.toolbar_main);
         toolbar.setNavigationIcon(R.drawable.ic_menu_white_24dp);
+        toolbar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new TextInputDialog.Builder(MainActivity.this, RenameListDialog.class)
+                        .setAction(R.id.action_rename_list)
+                        .setMessage(R.string.rename_list)
+                        .setText(currentListName)
+                        .show();
+            }
+        });
         setSupportActionBar(toolbar);
 
         ActionBar actionBar = getSupportActionBar();
@@ -227,6 +237,12 @@ public class MainActivity extends BinderActivity implements
                         .setHint(R.string.add_list_hint)
                         .show();
                 return true;
+            case R.id.action_rename_list:
+                new TextInputDialog.Builder(MainActivity.this, RenameListDialog.class)
+                        .setAction(R.id.action_rename_list)
+                        .setMessage(R.string.rename_list)
+                        .show();
+                return true;
             case R.id.action_view_about:
                 Intent intent = new Intent(this, AboutActivity.class);
                 startActivity(intent);
@@ -310,14 +326,27 @@ public class MainActivity extends BinderActivity implements
 
     @Override
     public void onInputComplete(String input, int action) {
-        if (isServiceConnected() && action == R.id.action_new_list) {
-            try {
-                getBinder().addList(input);
-            } catch (ShoppingListException e) {
-                Log.e(getClass().getSimpleName(), "List already exists", e);
-            }
-            selectList(getBinder().indexOf(input));
+        if (!isServiceConnected()) {
+            return;
         }
+
+        switch (action) {
+            case R.id.action_new_list:
+                try {
+                    getBinder().addList(input);
+                } catch (ShoppingListException e) {
+                    Log.e(getClass().getSimpleName(), "List already exists", e);
+                }
+                selectList(getBinder().indexOf(input));
+                break;
+            case R.id.action_rename_list:
+                getBinder().renameList(currentListName, input);
+                currentListName = input;
+                selectList(getBinder().indexOf(input));
+                break;
+        }
+
+
     }
 
     @Override
@@ -387,6 +416,13 @@ public class MainActivity extends BinderActivity implements
             }
 
             return true;
+        }
+    }
+
+    public static class RenameListDialog extends TextInputDialog {
+        @Override
+        public boolean onValidateInput(String input) {
+            return !input.isEmpty();
         }
     }
 }

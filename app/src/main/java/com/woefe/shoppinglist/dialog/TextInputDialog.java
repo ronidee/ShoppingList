@@ -49,7 +49,7 @@ public class TextInputDialog extends DialogFragment {
     private String hint;
     private int action;
     private EditText inputField;
-
+    private String inputText = "";
 
     public interface TextInputDialogListener {
         void onInputComplete(String input, int action);
@@ -73,7 +73,6 @@ public class TextInputDialog extends DialogFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
 
-        String inputText = "";
         if (savedInstanceState != null) {
             message = savedInstanceState.getString(KEY_MESSAGE);
             hint = savedInstanceState.getString(KEY_HINT);
@@ -161,6 +160,11 @@ public class TextInputDialog extends DialogFragment {
 
         public Builder setHint(String hint) {
             dialog.hint = hint;
+            return this;
+        }
+
+        public Builder setText(String text) {
+            dialog.inputText = text;
             return this;
         }
 
